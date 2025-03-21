@@ -129,10 +129,32 @@
                             <div class="mt-6">
                                 <!-- Basic Info Tab -->
                                 <div id="basic-tab" class="tab-content">
-                                    <form action="{{ route('portfolio.update', $portfolio) }}" method="POST" class="space-y-6">
+                                    <form action="{{ route('portfolio.update', $portfolio) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                                         @csrf
                                         @method('PUT')
                                         
+                                        <div class="flex items-center space-x-6">
+                                            <div class="shrink-0">
+                                                <img id="profile_preview" class="h-24 w-24 object-cover rounded-full" 
+                                                    src="{{ $portfolio->profile_picture_url ?? asset('images/default-avatar.png') }}" 
+                                                    alt="Profile picture">
+                                            </div>
+                                            <div>
+                                                <label for="profile_picture" class="block text-sm font-medium text-gray-700">Profile Picture</label>
+                                                <input type="file" name="profile_picture" id="profile_picture" accept="image/*"
+                                                    class="mt-1 block w-full text-sm text-gray-500
+                                                    file:mr-4 file:py-2 file:px-4
+                                                    file:rounded-full file:border-0
+                                                    file:text-sm file:font-semibold
+                                                    file:bg-indigo-50 file:text-indigo-700
+                                                    hover:file:bg-indigo-100"
+                                                    onchange="previewImage(event)">
+                                                @error('profile_picture')
+                                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                        </div>
+
                                         <div>
                                             <label for="name" class="block text-sm font-medium text-gray-700">Portfolio Name</label>
                                             <input type="text" name="name" id="name" value="{{ old('name', $portfolio->name) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
@@ -789,6 +811,18 @@
                 }
             });
         });
+
+        // Handle profile picture preview
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const preview = document.getElementById('profile_preview');
+                preview.src = reader.result;
+            }
+            if (event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
     </script>
 </body>
 </html> 

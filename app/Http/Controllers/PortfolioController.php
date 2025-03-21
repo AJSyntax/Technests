@@ -4,14 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\Portfolio;
 use App\Models\Template;
+use App\Services\ImageKitService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Http\Requests\PortfolioRequest;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller;
 
 class PortfolioController extends Controller
 {
+    use AuthorizesRequests, ValidatesRequests;
+    
+    protected $imageKit;
+
+    public function __construct(ImageKitService $imageKit)
+    {
+        $this->imageKit = $imageKit;
+    }
+
     public function index()
     {
         $portfolios = Cache::remember("user." . Auth::id() . ".portfolios", 3600, function () {
@@ -28,36 +44,18 @@ class PortfolioController extends Controller
     {
         $this->authorize('create', Portfolio::class);
 
-        return view('portfolio.create', [
+        return view('portfolios.create', [
             'templates' => Cache::remember('templates.all', 3600, function () {
                 return Template::all();
             })
         ]);
     }
 
-    public function store(Request $request)
+    public function store(PortfolioRequest $request)
     {
         $this->authorize('create', Portfolio::class);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'template_id' => 'required|exists:templates,id',
-            'title' => 'nullable|string|max:255',
-            'bio' => 'nullable|string',
-            'contact_email' => 'nullable|email',
-            'phone' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'website' => 'nullable|url',
-            'github_username' => 'nullable|string|max:255',
-            'linkedin_url' => 'nullable|url',
-            'is_public' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $portfolio = Auth::user()->portfolios()->create($validator->validated());
+        $portfolio = Auth::user()->portfolios()->create($request->validated());
 
         Cache::forget("user." . Auth::id() . ".portfolios");
 
@@ -73,39 +71,43 @@ class PortfolioController extends Controller
 
         $portfolio->load(['template', 'skills', 'projects', 'experiences', 'education', 'certifications']);
 
-        return view('portfolio.edit', compact('portfolio'));
+        return view('portfolios.edit', compact('portfolio'));
     }
 
-    public function update(Request $request, Portfolio $portfolio)
+    public function update(PortfolioRequest $request, Portfolio $portfolio)
     {
         $this->authorize('update', $portfolio);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'title' => 'nullable|string|max:255',
-            'bio' => 'nullable|string',
-            'contact_email' => 'nullable|email',
-            'phone' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
-            'website' => 'nullable|url',
-            'github_username' => 'nullable|string|max:255',
-            'linkedin_url' => 'nullable|url',
-            'is_public' => 'boolean',
-        ]);
+        $data = $request->validated();
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        // Handle profile picture upload
+        if ($request->hasFile('profile_picture')) {
+            try {
+                // Delete existing profile picture if it exists
+                if ($portfolio->profile_picture_file_id) {
+                    $this->imageKit->deleteImage($portfolio->profile_picture_file_id);
+                }
+
+                // Upload new profile picture
+                $result = $this->imageKit->uploadImage(
+                    $request->file('profile_picture'),
+                    'portfolio-pictures'
+                );
+
+                $data['profile_picture_url'] = $result['url'];
+                $data['profile_picture_path'] = $result['path'];
+                $data['profile_picture_file_id'] = $result['fileId'];
+            } catch (\Exception $e) {
+                return back()->withErrors(['profile_picture' => $e->getMessage()])->withInput();
+            }
         }
 
-        $portfolio->update($validator->validated());
+        $portfolio->update($data);
 
         Cache::forget("user." . Auth::id() . ".portfolios");
         Cache::forget("portfolio.{$portfolio->id}");
 
-        return response()->json([
-            'message' => 'Portfolio updated successfully.',
-            'portfolio' => $portfolio
-        ]);
+        return back()->with('success', 'Portfolio updated successfully.');
     }
 
     public function preview(Portfolio $portfolio)
@@ -114,7 +116,7 @@ class PortfolioController extends Controller
 
         $portfolio->load(['template', 'skills', 'projects', 'experiences', 'education', 'certifications']);
 
-        return view('portfolio.preview', compact('portfolio'));
+        return view('portfolios.preview', compact('portfolio'));
     }
 
     public function show(Portfolio $portfolio)
@@ -125,7 +127,7 @@ class PortfolioController extends Controller
 
         $portfolio->load(['template', 'skills', 'projects', 'experiences', 'education', 'certifications']);
 
-        return view('portfolio.show', compact('portfolio'));
+        return view('portfolios.show', compact('portfolio'));
     }
 
     public function destroy(Portfolio $portfolio)
@@ -194,7 +196,7 @@ class PortfolioController extends Controller
 
     public function duplicate(Portfolio $portfolio)
     {
-        $this->authorize('create', Portfolio::class);
+        $this->authorize('duplicate', $portfolio);
 
         $newPortfolio = $portfolio->replicate();
         $newPortfolio->name = $portfolio->name . ' (Copy)';

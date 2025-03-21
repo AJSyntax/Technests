@@ -19,11 +19,23 @@ class Portfolio extends Model
         'github_username',
         'linkedin_url',
         'is_public',
+        'profile_picture_url',
+        'profile_picture_path',
+        'profile_picture_file_id',
     ];
 
     protected $casts = [
         'is_public' => 'boolean',
     ];
+
+    protected $appends = [
+        'profile_picture',
+    ];
+
+    public function getProfilePictureAttribute()
+    {
+        return $this->profile_picture_url ?? asset('images/default-avatar.png');
+    }
 
     public function user()
     {

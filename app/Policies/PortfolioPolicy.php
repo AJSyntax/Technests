@@ -49,4 +49,12 @@ class PortfolioPolicy
     {
         return $user->id === $portfolio->user_id;
     }
+
+    /**
+     * Determine whether the user can duplicate the model.
+     */
+    public function duplicate(User $user, Portfolio $portfolio): bool
+    {
+        return $user->id === $portfolio->user_id;
+    }
 } 
