@@ -32,7 +32,7 @@
                             <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                                 {{ __('Dashboard') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('portfolio.index')" :active="request()->routeIs('portfolio.*')">
+                            <x-nav-link :href="route('portfolios.index')" :active="request()->routeIs('portfolios.*')">
                                 {{ __('Portfolios') }}
                             </x-nav-link>
                             <x-nav-link :href="route('templates.index')" :active="request()->routeIs('templates.*')">
@@ -90,7 +90,7 @@
 
                     <!-- Quick Actions -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                        <a href="{{ route('portfolio.create') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition-shadow duration-200">
+                        <a href="{{ route('portfolios.create') }}" class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition-shadow duration-200">
                             <div class="p-6">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
@@ -144,7 +144,7 @@
                         <div class="p-6 text-gray-900">
                             <div class="flex justify-between items-center mb-4">
                                 <h2 class="text-xl font-semibold">Recent Portfolios</h2>
-                                <a href="{{ route('portfolio.index') }}" class="text-indigo-600 hover:text-indigo-900">View All</a>
+                                <a href="{{ route('portfolios.index') }}" class="text-indigo-600 hover:text-indigo-900">View All</a>
                             </div>
                             
                             @if($portfolios->count() > 0)
@@ -159,7 +159,7 @@
                                                         Last updated: {{ $portfolio->updated_at->diffForHumans() }}
                                                     </span>
                                                     <div class="flex space-x-2">
-                                                        <a href="{{ route('portfolio.edit', $portfolio) }}" class="text-indigo-600 hover:text-indigo-900">
+                                                        <a href="{{ route('portfolios.edit', $portfolio) }}" class="text-indigo-600 hover:text-indigo-900">
                                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                             </svg>
@@ -184,7 +184,7 @@
                                     <h3 class="mt-2 text-sm font-medium text-gray-900">No portfolios</h3>
                                     <p class="mt-1 text-sm text-gray-500">Get started by creating a new portfolio.</p>
                                     <div class="mt-6">
-                                        <a href="{{ route('portfolio.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        <a href="{{ route('portfolios.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                             </svg>

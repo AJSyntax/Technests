@@ -2,29 +2,29 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Portfolio extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
+        'name',
         'user_id',
         'template_id',
-        'name',
-        'title',
-        'bio',
-        'contact_email',
-        'phone',
-        'location',
-        'website',
-        'github_username',
-        'linkedin_url',
-        'is_public',
-        'profile_picture_url',
-        'profile_picture_path',
-        'profile_picture_file_id',
+        'personal_info',
+        'skills',
+        'experience',
+        'projects',
     ];
 
     protected $casts = [
+        'personal_info' => 'array',
+        'skills' => 'array',
+        'experience' => 'array',
+        'projects' => 'array',
         'is_public' => 'boolean',
     ];
 
@@ -35,6 +35,26 @@ class Portfolio extends Model
     public function getProfilePictureAttribute()
     {
         return $this->profile_picture_url ?? asset('images/default-avatar.png');
+    }
+
+    public function setPersonalInfoAttribute($value)
+    {
+        $this->attributes['personal_info'] = is_array($value) ? json_encode($value) : $value;
+    }
+
+    public function setSkillsAttribute($value)
+    {
+        $this->attributes['skills'] = is_array($value) ? json_encode($value) : $value;
+    }
+
+    public function setExperienceAttribute($value)
+    {
+        $this->attributes['experience'] = is_array($value) ? json_encode($value) : $value;
+    }
+
+    public function setProjectsAttribute($value)
+    {
+        $this->attributes['projects'] = is_array($value) ? json_encode($value) : $value;
     }
 
     public function user()

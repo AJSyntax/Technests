@@ -3,7 +3,7 @@
         <!-- Header Section -->
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-semibold text-gray-800">My Portfolios</h1>
-            <a href="{{ route('portfolio.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+            <a href="{{ route('portfolios.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -46,14 +46,14 @@
                         
                         <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                             <div class="flex space-x-2">
-                                <a href="{{ route('portfolio.edit', $portfolio) }}" class="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-sm font-medium text-gray-700 transition-colors duration-150">
+                                <a href="{{ route('portfolios.edit', $portfolio) }}" class="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-md text-sm font-medium text-gray-700 transition-colors duration-150">
                                     Edit
                                 </a>
                                 <button wire:click="deletePortfolio({{ $portfolio->id }})" class="inline-flex items-center px-3 py-1 bg-red-100 hover:bg-red-200 rounded-md text-sm font-medium text-red-700 transition-colors duration-150">
                                     Delete
                                 </button>
                             </div>
-                            <a href="{{ route('portfolio.preview', $portfolio) }}" class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-900">
+                            <a href="{{ route('portfolios.preview', $portfolio) }}" class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-900">
                                 Preview
                                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -71,7 +71,7 @@
                         <h3 class="mt-2 text-sm font-medium text-gray-900">No portfolios found</h3>
                         <p class="mt-1 text-sm text-gray-500">Get started by creating a new portfolio.</p>
                         <div class="mt-6">
-                            <a href="{{ route('portfolio.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                            <a href="{{ route('portfolios.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                 </svg>

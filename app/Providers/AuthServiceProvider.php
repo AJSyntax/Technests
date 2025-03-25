@@ -15,6 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Portfolio::class => PortfolioPolicy::class,
+        'App\Models\Portfolio' => 'App\Policies\PortfolioPolicy',
     ];
 
     /**

@@ -16,6 +16,8 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Storage;
+use ZipArchive;
 
 class PortfolioController extends Controller
 {
@@ -30,205 +32,212 @@ class PortfolioController extends Controller
 
     public function index()
     {
-        $portfolios = Cache::remember("user." . Auth::id() . ".portfolios", 3600, function () {
-            return Auth::user()->portfolios()
-                ->with(['template', 'skills', 'projects'])
-                ->latest()
-                ->paginate(9);
-        });
-
-        return response()->json($portfolios);
+        $portfolios = auth()->user()->portfolios()->latest()->paginate(10);
+        return view('portfolios.index', compact('portfolios'));
     }
 
     public function create()
     {
-        $this->authorize('create', Portfolio::class);
-
-        return view('portfolios.create', [
-            'templates' => Cache::remember('templates.all', 3600, function () {
-                return Template::all();
-            })
-        ]);
+        return view('portfolios.create');
     }
 
-    public function store(PortfolioRequest $request)
+    public function store(Request $request)
     {
-        $this->authorize('create', Portfolio::class);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'template_id' => 'required|exists:templates,id',
+            'personal_info' => 'required|array',
+            'skills' => 'required|array',
+            'experience' => 'required|array',
+            'projects' => 'required|array',
+            'education' => 'required|array',
+            'certifications' => 'required|array',
+        ]);
 
-        $portfolio = Auth::user()->portfolios()->create($request->validated());
+        $portfolio = Auth::user()->portfolios()->create($validated);
 
-        Cache::forget("user." . Auth::id() . ".portfolios");
-
-        return response()->json([
-            'message' => 'Portfolio created successfully.',
-            'portfolio' => $portfolio
-        ], 201);
+        return redirect()->route('portfolios.edit', $portfolio)
+            ->with('success', 'Portfolio created successfully!');
     }
 
     public function edit(Portfolio $portfolio)
     {
         $this->authorize('update', $portfolio);
-
-        $portfolio->load(['template', 'skills', 'projects', 'experiences', 'education', 'certifications']);
-
         return view('portfolios.edit', compact('portfolio'));
     }
 
-    public function update(PortfolioRequest $request, Portfolio $portfolio)
+    public function update(Request $request, Portfolio $portfolio)
     {
         $this->authorize('update', $portfolio);
 
-        $data = $request->validated();
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'template_id' => 'required|exists:templates,id',
+            'personal_info' => 'required|array',
+            'skills' => 'required|array',
+            'experience' => 'required|array',
+            'projects' => 'required|array',
+            'education' => 'required|array',
+            'certifications' => 'required|array',
+        ]);
 
-        // Handle profile picture upload
-        if ($request->hasFile('profile_picture')) {
-            try {
-                // Delete existing profile picture if it exists
-                if ($portfolio->profile_picture_file_id) {
-                    $this->imageKit->deleteImage($portfolio->profile_picture_file_id);
-                }
+        $portfolio->update($validated);
 
-                // Upload new profile picture
-                $result = $this->imageKit->uploadImage(
-                    $request->file('profile_picture'),
-                    'portfolio-pictures'
-                );
-
-                $data['profile_picture_url'] = $result['url'];
-                $data['profile_picture_path'] = $result['path'];
-                $data['profile_picture_file_id'] = $result['fileId'];
-            } catch (\Exception $e) {
-                return back()->withErrors(['profile_picture' => $e->getMessage()])->withInput();
-            }
-        }
-
-        $portfolio->update($data);
-
-        Cache::forget("user." . Auth::id() . ".portfolios");
-        Cache::forget("portfolio.{$portfolio->id}");
-
-        return back()->with('success', 'Portfolio updated successfully.');
-    }
-
-    public function preview(Portfolio $portfolio)
-    {
-        $this->authorize('view', $portfolio);
-
-        $portfolio->load(['template', 'skills', 'projects', 'experiences', 'education', 'certifications']);
-
-        return view('portfolios.preview', compact('portfolio'));
-    }
-
-    public function show(Portfolio $portfolio)
-    {
-        if (!$portfolio->is_public) {
-            abort(404);
-        }
-
-        $portfolio->load(['template', 'skills', 'projects', 'experiences', 'education', 'certifications']);
-
-        return view('portfolios.show', compact('portfolio'));
+        return redirect()->back()->with('success', 'Portfolio updated successfully!');
     }
 
     public function destroy(Portfolio $portfolio)
     {
         $this->authorize('delete', $portfolio);
+        
+        // Delete associated files if any
+        if (!empty($portfolio->projects)) {
+            foreach ($portfolio->projects as $project) {
+                if (!empty($project['image'])) {
+                    Storage::delete(str_replace('/storage/', 'public/', $project['image']));
+                }
+            }
+        }
 
         $portfolio->delete();
+        
+        return redirect()->route('portfolios.index')
+            ->with('success', 'Portfolio deleted successfully.');
+    }
 
-        Cache::forget("user." . Auth::id() . ".portfolios");
-        Cache::forget("portfolio.{$portfolio->id}");
+    public function download(Portfolio $portfolio)
+    {
+        $this->authorize('view', $portfolio);
+        
+        $template = $portfolio->template;
+        
+        // Create a temporary directory
+        $tempDir = storage_path('app/temp/' . uniqid());
+        mkdir($tempDir, 0755, true);
+        
+        // Generate the portfolio HTML using the template
+        $html = view('templates.render', [
+            'portfolio' => $portfolio,
+            'template' => $template
+        ])->render();
+        
+        // Save the files
+        file_put_contents($tempDir . '/index.html', $html);
+        file_put_contents($tempDir . '/style.css', $template->css_template);
+        
+        // Create ZIP archive
+        $zipPath = storage_path('app/temp/' . $portfolio->name . '.zip');
+        $zip = new ZipArchive();
+        $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($tempDir),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($tempDir) + 1);
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
+        
+        $zip->close();
+        
+        // Clean up temporary directory
+        array_map('unlink', glob("$tempDir/*.*"));
+        rmdir($tempDir);
+        
+        return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
 
-        return response()->json(['message' => 'Portfolio deleted successfully']);
+    public function preview(Portfolio $portfolio)
+    {
+        $this->authorize('view', $portfolio);
+        
+        // Get the template
+        $template = $portfolio->template;
+        
+        // Prepare the data for the template
+        $data = [
+            'portfolio' => $portfolio,
+            'personal_info' => $portfolio->personal_info,
+            'skills' => $portfolio->skills,
+            'experience' => $portfolio->experience,
+            'projects' => $portfolio->projects,
+        ];
+
+        // Return the template view with the portfolio data
+        return view("templates.{$template->slug}.index", $data);
+    }
+
+    public function show(Portfolio $portfolio)
+    {
+        $this->authorize('view', $portfolio);
+        return view('portfolios.show', compact('portfolio'));
     }
 
     public function bulkDelete(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'portfolio_ids' => 'required|array',
-            'portfolio_ids.*' => 'exists:portfolios,id'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $portfolios = Portfolio::whereIn('id', $validator->validated()['portfolio_ids'])
-            ->where('user_id', Auth::id())
-            ->get();
-
+        $portfolios = Portfolio::whereIn('id', $request->ids)->where('user_id', auth()->id())->get();
+        
         foreach ($portfolios as $portfolio) {
             $this->authorize('delete', $portfolio);
+            
+            // Delete associated files if any
+            if (!empty($portfolio->projects)) {
+                foreach ($portfolio->projects as $project) {
+                    if (!empty($project['image'])) {
+                        Storage::delete(str_replace('/storage/', 'public/', $project['image']));
+                    }
+                }
+            }
+
             $portfolio->delete();
         }
 
-        Cache::forget("user." . Auth::id() . ".portfolios");
-
-        return response()->json(['message' => 'Selected portfolios deleted successfully']);
+        return response()->json(['message' => 'Portfolios deleted successfully.']);
     }
 
     public function search(Request $request)
     {
-        $query = Auth::user()->portfolios();
-
-        if ($request->has('name')) {
-            $query->where('name', 'like', "%{$request->name}%");
-        }
-
-        if ($request->has('title')) {
-            $query->where('title', 'like', "%{$request->title}%");
-        }
-
-        if ($request->has('is_public')) {
-            $query->where('is_public', $request->boolean('is_public'));
-        }
-
-        if ($request->has('template_id')) {
-            $query->where('template_id', $request->template_id);
-        }
-
-        $portfolios = $query->with(['template', 'skills', 'projects'])
+        $query = $request->get('q');
+        $portfolios = auth()->user()->portfolios()
+            ->where('name', 'like', "%{$query}%")
+            ->orWhere('personal_info->title', 'like', "%{$query}%")
             ->latest()
-            ->paginate($request->per_page ?? 9);
+            ->paginate(10);
 
-        return response()->json($portfolios);
+        return view('portfolios.index', compact('portfolios'));
     }
 
     public function duplicate(Portfolio $portfolio)
     {
-        $this->authorize('duplicate', $portfolio);
+        $this->authorize('view', $portfolio);
 
         $newPortfolio = $portfolio->replicate();
         $newPortfolio->name = $portfolio->name . ' (Copy)';
-        $newPortfolio->user_id = Auth::id();
         $newPortfolio->save();
 
-        // Duplicate related records
-        foreach ($portfolio->skills as $skill) {
-            $newPortfolio->skills()->create($skill->toArray());
+        // Duplicate project images if any
+        if (!empty($portfolio->projects)) {
+            $projects = $portfolio->projects;
+            foreach ($projects as &$project) {
+                if (!empty($project['image'])) {
+                    $oldPath = str_replace('/storage/', 'public/', $project['image']);
+                    $newPath = 'public/projects/' . uniqid() . '_' . basename($project['image']);
+                    if (Storage::exists($oldPath)) {
+                        Storage::copy($oldPath, $newPath);
+                        $project['image'] = Storage::url($newPath);
+                    }
+                }
+            }
+            $newPortfolio->projects = $projects;
+            $newPortfolio->save();
         }
 
-        foreach ($portfolio->projects as $project) {
-            $newPortfolio->projects()->create($project->toArray());
-        }
-
-        foreach ($portfolio->experiences as $experience) {
-            $newPortfolio->experiences()->create($experience->toArray());
-        }
-
-        foreach ($portfolio->education as $education) {
-            $newPortfolio->education()->create($education->toArray());
-        }
-
-        foreach ($portfolio->certifications as $certification) {
-            $newPortfolio->certifications()->create($certification->toArray());
-        }
-
-        Cache::forget("user." . Auth::id() . ".portfolios");
-
-        return response()->json([
-            'message' => 'Portfolio duplicated successfully.',
-            'portfolio' => $newPortfolio
-        ]);
+        return redirect()->route('portfolios.index')
+            ->with('success', 'Portfolio duplicated successfully.');
     }
 } 

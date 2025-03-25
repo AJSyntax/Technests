@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('templates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('thumbnail_path');
             $table->text('description');
+            $table->string('thumbnail_url')->nullable();
             $table->boolean('is_premium')->default(false);
-            $table->decimal('price', 8, 2)->nullable();
-            $table->string('preview_url')->nullable();
-            $table->json('features')->nullable();
+            $table->decimal('price', 10, 2)->default(0);
+            $table->text('html_template')->nullable();
+            $table->text('css_template')->nullable();
             $table->timestamps();
         });
     }
@@ -31,4 +31,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('templates');
     }
-};
+}; 

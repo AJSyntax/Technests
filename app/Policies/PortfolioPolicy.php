@@ -23,7 +23,7 @@ class PortfolioPolicy
      */
     public function view(User $user, Portfolio $portfolio): bool
     {
-        return $portfolio->is_public || $user->id === $portfolio->user_id;
+        return $user->id === $portfolio->user_id || $user->isAdmin();
     }
 
     /**
@@ -39,7 +39,7 @@ class PortfolioPolicy
      */
     public function update(User $user, Portfolio $portfolio): bool
     {
-        return $user->id === $portfolio->user_id;
+        return $user->id === $portfolio->user_id || $user->isAdmin();
     }
 
     /**
@@ -47,7 +47,7 @@ class PortfolioPolicy
      */
     public function delete(User $user, Portfolio $portfolio): bool
     {
-        return $user->id === $portfolio->user_id;
+        return $user->id === $portfolio->user_id || $user->isAdmin();
     }
 
     /**

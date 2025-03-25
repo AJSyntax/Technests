@@ -2,23 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Template extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
-        'thumbnail_path',
         'description',
+        'thumbnail_url',
         'is_premium',
         'price',
-        'preview_url',
-        'features',
+        'html_template',
+        'css_template',
     ];
 
     protected $casts = [
         'is_premium' => 'boolean',
-        'features' => 'array',
         'price' => 'decimal:2',
     ];
 

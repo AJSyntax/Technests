@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Template;
 use App\Models\Activity;
 use App\Http\Controllers\TemplatePreviewController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\GithubController;
+use App\Http\Controllers\PublicPortfolioController;
 
 Route::view('/', 'welcome')->name('home');
 
@@ -57,48 +60,48 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Portfolio Routes
     Route::middleware(['auth'])->group(function () {
-        Route::get('/portfolios', [PortfolioController::class, 'index'])->name('portfolio.index');
-        Route::get('/portfolios/create', [PortfolioController::class, 'create'])->name('portfolio.create');
+        Route::get('/portfolios', [PortfolioController::class, 'index'])->name('portfolios.index');
+        Route::get('/portfolios/create', [PortfolioController::class, 'create'])->name('portfolios.create');
         Route::post('/portfolios', [PortfolioController::class, 'store'])->name('portfolio.store');
-        Route::get('/portfolios/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
+        Route::get('/portfolios/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('portfolios.edit');
         Route::put('/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolio.update');
-        Route::delete('/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolio.destroy');
+        Route::delete('/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolios.destroy');
         Route::post('/portfolios/bulk-delete', [PortfolioController::class, 'bulkDelete'])->name('portfolio.bulk-delete');
         Route::post('/portfolios/{portfolio}/duplicate', [PortfolioController::class, 'duplicate'])->name('portfolio.duplicate');
         Route::get('/portfolios/search', [PortfolioController::class, 'search'])->name('portfolio.search');
-        Route::get('/portfolios/{portfolio}/preview', [PortfolioController::class, 'preview'])->name('portfolio.preview');
+        Route::get('/portfolios/{portfolio}/preview', [PortfolioController::class, 'preview'])->name('portfolios.preview');
 
         // Experience Routes
         Route::prefix('{portfolio}/experience')->name('experience.')->group(function () {
-            Route::get('/', [ExperienceController::class, 'index'])->name('index');
-            Route::post('/', [ExperienceController::class, 'store'])->name('store');
-            Route::put('/{experience}', [ExperienceController::class, 'update'])->name('update');
-            Route::delete('/{experience}', [ExperienceController::class, 'destroy'])->name('destroy');
-            Route::post('/reorder', [ExperienceController::class, 'reorder'])->name('reorder');
-            Route::post('/bulk-delete', [ExperienceController::class, 'bulkDelete'])->name('bulk-delete');
-            Route::get('/search', [ExperienceController::class, 'search'])->name('search');
+            Route::get('/', [ExperienceController::class, 'index'])->name('experience.index');
+            Route::post('/', [ExperienceController::class, 'store'])->name('experience.store');
+            Route::put('/{experience}', [ExperienceController::class, 'update'])->name('experience.update');
+            Route::delete('/{experience}', [ExperienceController::class, 'destroy'])->name('experience.destroy');
+            Route::post('/reorder', [ExperienceController::class, 'reorder'])->name('experience.reorder');
+            Route::post('/bulk-delete', [ExperienceController::class, 'bulkDelete'])->name('experience.bulk-delete');
+            Route::get('/search', [ExperienceController::class, 'search'])->name('experience.search');
         });
 
         // Education Routes
         Route::prefix('{portfolio}/education')->name('education.')->group(function () {
-            Route::get('/', [EducationController::class, 'index'])->name('index');
-            Route::post('/', [EducationController::class, 'store'])->name('store');
-            Route::put('/{education}', [EducationController::class, 'update'])->name('update');
-            Route::delete('/{education}', [EducationController::class, 'destroy'])->name('destroy');
-            Route::post('/reorder', [EducationController::class, 'reorder'])->name('reorder');
-            Route::post('/bulk-delete', [EducationController::class, 'bulkDelete'])->name('bulk-delete');
-            Route::get('/search', [EducationController::class, 'search'])->name('search');
+            Route::get('/', [EducationController::class, 'index'])->name('education.index');
+            Route::post('/', [EducationController::class, 'store'])->name('education.store');
+            Route::put('/{education}', [EducationController::class, 'update'])->name('education.update');
+            Route::delete('/{education}', [EducationController::class, 'destroy'])->name('education.destroy');
+            Route::post('/reorder', [EducationController::class, 'reorder'])->name('education.reorder');
+            Route::post('/bulk-delete', [EducationController::class, 'bulkDelete'])->name('education.bulk-delete');
+            Route::get('/search', [EducationController::class, 'search'])->name('education.search');
         });
 
         // Certification Routes
         Route::prefix('{portfolio}/certification')->name('certification.')->group(function () {
-            Route::get('/', [CertificationController::class, 'index'])->name('index');
-            Route::post('/', [CertificationController::class, 'store'])->name('store');
-            Route::put('/{certification}', [CertificationController::class, 'update'])->name('update');
-            Route::delete('/{certification}', [CertificationController::class, 'destroy'])->name('destroy');
-            Route::post('/reorder', [CertificationController::class, 'reorder'])->name('reorder');
-            Route::post('/bulk-delete', [CertificationController::class, 'bulkDelete'])->name('bulk-delete');
-            Route::get('/search', [CertificationController::class, 'search'])->name('search');
+            Route::get('/', [CertificationController::class, 'index'])->name('certification.index');
+            Route::post('/', [CertificationController::class, 'store'])->name('certification.store');
+            Route::put('/{certification}', [CertificationController::class, 'update'])->name('certification.update');
+            Route::delete('/{certification}', [CertificationController::class, 'destroy'])->name('certification.destroy');
+            Route::post('/reorder', [CertificationController::class, 'reorder'])->name('certification.reorder');
+            Route::post('/bulk-delete', [CertificationController::class, 'bulkDelete'])->name('certification.bulk-delete');
+            Route::get('/search', [CertificationController::class, 'search'])->name('certification.search');
         });
     });
 
@@ -106,9 +109,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Public portfolio routes
-Route::get('/p/{portfolio}', [PortfolioController::class, 'show'])->name('portfolio.show');
+Route::get('/p/{portfolio}', [PublicPortfolioController::class, 'show'])->name('public.portfolios.show');
 
 Route::get('/templates/{templateSlug}/preview', [TemplatePreviewController::class, 'show'])
     ->name('templates.preview');
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('users', [AdminController::class, 'users'])->name('users.index');
+    Route::get('users/{user}', [AdminController::class, 'userShow'])->name('users.show');
+    Route::post('users/{user}/toggle-status', [AdminController::class, 'userToggleStatus'])
+        ->name('users.toggle-status');
+    Route::get('activity-log', [AdminController::class, 'activityLog'])->name('activity-log');
+    Route::get('downloads', [AdminController::class, 'downloadLog'])->name('downloads');
+
+    // Admin template management
+    Route::resource('templates', TemplateController::class)->except(['index', 'show']);
+});
 
 require __DIR__.'/auth.php';

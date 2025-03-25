@@ -32,7 +32,7 @@
                             <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                                 {{ __('Dashboard') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('portfolio.index')" :active="request()->routeIs('portfolio.*')">
+                            <x-nav-link :href="route('portfolios.index')" :active="request()->routeIs('portfolios.*')">
                                 {{ __('Portfolios') }}
                             </x-nav-link>
                             <x-nav-link :href="route('templates.index')" :active="request()->routeIs('templates.*')">
@@ -88,7 +88,7 @@
                             </h2>
                         </div>
                         <div class="mt-4 flex md:ml-4 md:mt-0">
-                            <a href="{{ route('portfolio.show', $portfolio) }}" class="ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                            <a href="{{ route('portfolios.show', $portfolio) }}" class="ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                                 <svg class="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
                                     <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-7zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
@@ -129,7 +129,7 @@
                             <div class="mt-6">
                                 <!-- Basic Info Tab -->
                                 <div id="basic-tab" class="tab-content">
-                                    <form action="{{ route('portfolio.update', $portfolio) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                                    <form action="{{ route('portfolios.update', $portfolio) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                                         @csrf
                                         @method('PUT')
                                         
@@ -244,7 +244,7 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                             </svg>
                                                         </button>
-                                                        <form action="{{ route('portfolio.experience.destroy', [$portfolio, $experience]) }}" method="POST" class="inline">
+                                                        <form action="{{ route('portfolios.experience.destroy', [$portfolio, $experience]) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this experience?')">
@@ -290,7 +290,7 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                             </svg>
                                                         </button>
-                                                        <form action="{{ route('portfolio.education.destroy', [$portfolio, $education]) }}" method="POST" class="inline">
+                                                        <form action="{{ route('portfolios.education.destroy', [$portfolio, $education]) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this education entry?')">
@@ -342,7 +342,7 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                             </svg>
                                                         </button>
-                                                        <form action="{{ route('portfolio.certification.destroy', [$portfolio, $certification]) }}" method="POST" class="inline">
+                                                        <form action="{{ route('portfolios.certification.destroy', [$portfolio, $certification]) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this certification?')">
@@ -392,7 +392,7 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                             </svg>
                                                         </button>
-                                                        <form action="{{ route('portfolio.project.destroy', [$portfolio, $project]) }}" method="POST" class="inline">
+                                                        <form action="{{ route('portfolios.project.destroy', [$portfolio, $project]) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this project?')">
@@ -412,7 +412,7 @@
 
                                 <!-- Settings Tab -->
                                 <div id="settings-tab" class="tab-content hidden">
-                                    <form action="{{ route('portfolio.update', $portfolio) }}" method="POST" class="space-y-6">
+                                    <form action="{{ route('portfolios.update', $portfolio) }}" method="POST" class="space-y-6">
                                         @csrf
                                         @method('PUT')
                                         
@@ -465,7 +465,7 @@
     <div id="experience-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <form id="experience-form" action="{{ route('portfolio.experience.store', $portfolio) }}" method="POST">
+                <form id="experience-form" action="{{ route('portfolios.experience.store', $portfolio) }}" method="POST">
                     @csrf
                     <div class="space-y-4">
                         <div>
@@ -519,7 +519,7 @@
     <div id="education-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <form id="education-form" action="{{ route('portfolio.education.store', $portfolio) }}" method="POST">
+                <form id="education-form" action="{{ route('portfolios.education.store', $portfolio) }}" method="POST">
                     @csrf
                     <div class="space-y-4">
                         <div>
@@ -573,7 +573,7 @@
     <div id="certification-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <form id="certification-form" action="{{ route('portfolio.certification.store', $portfolio) }}" method="POST">
+                <form id="certification-form" action="{{ route('portfolios.certification.store', $portfolio) }}" method="POST">
                     @csrf
                     <div class="space-y-4">
                         <div>
@@ -617,7 +617,7 @@
     <div id="project-modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden">
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <form id="project-form" action="{{ route('portfolio.project.store', $portfolio) }}" method="POST">
+                <form id="project-form" action="{{ route('portfolios.project.store', $portfolio) }}" method="POST">
                     @csrf
                     <div class="space-y-4">
                         <div>
