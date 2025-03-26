@@ -12,7 +12,7 @@ class TemplateSeeder extends Seeder
         Template::create([
             'name' => 'Modern Portfolio',
             'description' => 'A modern, clean portfolio template with a hero section, about me, projects showcase, and contact form. Perfect for developers and creative professionals.',
-            'thumbnail_path' => 'templates/modern-portfolio-thumb.jpg',
+            'thumbnail_url' => 'templates/modern-portfolio-thumb.jpg',
             'preview_url' => '/templates/modern-portfolio/preview',
             'is_premium' => false,
             'features' => json_encode([
@@ -30,7 +30,7 @@ class TemplateSeeder extends Seeder
         Template::create([
             'name' => 'IT Programmer Portfolio',
             'description' => 'A modern, elegant template designed specifically for IT professionals and programmers. Features sections for technical skills, project showcases, and professional experience.',
-            'thumbnail_path' => 'templates/it-programmer-thumb.jpg',
+            'thumbnail_url' => 'templates/it-programmer-thumb.jpg',
             'preview_url' => '/templates/it-programmer/preview',
             'is_premium' => false,
             'features' => json_encode([

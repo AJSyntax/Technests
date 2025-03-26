@@ -85,6 +85,12 @@ class PortfolioBuilder extends Component
         }
     }
 
+    public function selectTemplate($templateId)
+    {
+        $this->selectedTemplate = $templateId;
+        session()->flash('message', 'Template selected successfully!');
+    }
+
     public function loadPortfolioData()
     {
         $personalInfo = $this->portfolio->personal_info;

@@ -44,16 +44,25 @@
         @if($step === 1)
             <div>
                 <h2 class="text-2xl font-semibold mb-4">Choose a Template</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($templates as $template)
-                        <div wire:click="$set('selectedTemplate', {{ $template->id }})"
-                            class="border rounded-lg p-4 cursor-pointer {{ $selectedTemplate == $template->id ? 'border-blue-500 ring-2 ring-blue-500' : 'hover:border-gray-400' }}">
-                            <img src="{{ asset($template->thumbnail_url) }}" alt="{{ $template->name }}" class="w-full h-48 object-cover rounded-md mb-4">
-                            <h3 class="text-lg font-semibold">{{ $template->name }}</h3>
-                            <p class="text-gray-600">{{ $template->description }}</p>
-                        </div>
-                    @endforeach
-                </div>
+                @if($templates->isEmpty())
+                    <p class="text-gray-500 text-center py-4">No templates available.</p>
+                @else
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($templates as $template)
+                            <div wire:click="selectTemplate({{ $template->id }})"
+                                class="border rounded-lg p-4 cursor-pointer {{ $selectedTemplate == $template->id ? 'border-blue-500 ring-2 ring-blue-500' : 'hover:border-gray-400' }}">
+                                <img src="{{ asset('storage/' . str_replace('/templates/', 'templates/', $template->thumbnail_url)) }}" 
+                                    alt="{{ $template->name }}" 
+                                    class="w-full h-48 object-cover rounded-md mb-4">
+                                <h3 class="text-lg font-semibold">{{ $template->name }}</h3>
+                                <p class="text-gray-600">{{ $template->description }}</p>
+                                @if($selectedTemplate == $template->id)
+                                    <div class="mt-2 text-sm text-blue-500">Selected</div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         @endif
 

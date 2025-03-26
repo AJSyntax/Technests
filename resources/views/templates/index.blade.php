@@ -80,7 +80,7 @@
             @endif
 
             <!-- Pagination -->
-            @if($templates->hasPages())
+            @if(method_exists($templates, 'hasPages') && $templates->hasPages())
                 <div class="mt-8">
                     {{ $templates->links() }}
                 </div>

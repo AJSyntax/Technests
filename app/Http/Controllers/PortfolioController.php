@@ -166,6 +166,7 @@ class PortfolioController extends Controller
             'skills' => $portfolio->skills,
             'experience' => $portfolio->experience,
             'projects' => $portfolio->projects,
+            'templates' => Template::paginate(9),
         ];
 
         // Return the template view with the portfolio data

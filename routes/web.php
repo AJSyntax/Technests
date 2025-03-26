@@ -62,13 +62,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['auth'])->group(function () {
         Route::get('/portfolios', [PortfolioController::class, 'index'])->name('portfolios.index');
         Route::get('/portfolios/create', [PortfolioController::class, 'create'])->name('portfolios.create');
-        Route::post('/portfolios', [PortfolioController::class, 'store'])->name('portfolio.store');
+        Route::post('/portfolios', [PortfolioController::class, 'store'])->name('portfolios.store');
+        Route::get('/portfolios/{portfolio}', [PortfolioController::class, 'show'])->name('portfolios.show');
         Route::get('/portfolios/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('portfolios.edit');
-        Route::put('/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolio.update');
+        Route::put('/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolios.update');
         Route::delete('/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolios.destroy');
-        Route::post('/portfolios/bulk-delete', [PortfolioController::class, 'bulkDelete'])->name('portfolio.bulk-delete');
-        Route::post('/portfolios/{portfolio}/duplicate', [PortfolioController::class, 'duplicate'])->name('portfolio.duplicate');
-        Route::get('/portfolios/search', [PortfolioController::class, 'search'])->name('portfolio.search');
+        Route::post('/portfolios/bulk-delete', [PortfolioController::class, 'bulkDelete'])->name('portfolios.bulk-delete');
+        Route::post('/portfolios/{portfolio}/duplicate', [PortfolioController::class, 'duplicate'])->name('portfolios.duplicate');
+        Route::get('/portfolios/search', [PortfolioController::class, 'search'])->name('portfolios.search');
         Route::get('/portfolios/{portfolio}/preview', [PortfolioController::class, 'preview'])->name('portfolios.preview');
 
         // Experience Routes
