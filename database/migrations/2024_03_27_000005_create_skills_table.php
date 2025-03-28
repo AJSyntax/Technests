@@ -6,28 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('skills', function (Blueprint $table) {
             $table->id();
             $table->foreignId('portfolio_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('category')->nullable(); // e.g., Programming Languages, Frameworks, Tools
-            $table->integer('proficiency_level')->nullable(); // 1-5 scale
-            $table->integer('years_experience')->nullable();
-            $table->text('description')->nullable();
+            $table->string('category');
+            $table->text('description');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('skills');
     }
-};
+}; 

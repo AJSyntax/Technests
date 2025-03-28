@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Template;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TemplateController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
-        $templates = Template::all();
-        return view('templates.index', compact('templates'));
+        $templates = Template::where('is_premium', false)->get();
+        $premiumTemplates = Template::where('is_premium', true)->get();
+        return view('templates.index', compact('templates', 'premiumTemplates'));
     }
 
     public function show(Template $template)
@@ -102,5 +109,42 @@ class TemplateController extends Controller
         $template->delete();
         return redirect()->route('admin.templates.index')
             ->with('success', 'Template deleted successfully!');
+    }
+
+    public function purchase(Template $template)
+    {
+        if ($template->is_premium) {
+            return view('templates.purchase', compact('template'));
+        }
+
+        return redirect()->back()->with('error', 'This template is not available for purchase.');
+    }
+
+    public function processPurchase(Request $request, Template $template)
+    {
+        if (!$template->is_premium) {
+            return redirect()->back()->with('error', 'This template is not available for purchase.');
+        }
+
+        // Check if user already purchased this template
+        if (Auth::user()->purchases()->where('template_id', $template->id)->where('status', 'completed')->exists()) {
+            return redirect()->back()->with('error', 'You have already purchased this template.');
+        }
+
+        // Create a new purchase record
+        $purchase = Auth::user()->purchases()->create([
+            'template_id' => $template->id,
+            'amount' => $template->price,
+            'status' => 'pending',
+            'payment_method' => $request->payment_method,
+            'transaction_id' => uniqid('TXN_'),
+        ]);
+
+        // Here you would typically integrate with a payment gateway
+        // For now, we'll just mark it as completed
+        $purchase->update(['status' => 'completed']);
+
+        return redirect()->route('portfolios.create')
+            ->with('success', 'Template purchased successfully! You can now use it to create a portfolio.');
     }
 } 

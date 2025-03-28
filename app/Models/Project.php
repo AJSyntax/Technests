@@ -8,24 +8,14 @@ class Project extends Model
 {
     protected $fillable = [
         'portfolio_id',
-        'name',
+        'title',
         'description',
         'github_url',
-        'live_url',
-        'image_path',
-        'technologies_used',
-        'start_date',
-        'end_date',
-        'is_featured',
-        'display_order',
+        'technologies',
     ];
 
     protected $casts = [
-        'technologies_used' => 'array',
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'is_featured' => 'boolean',
-        'display_order' => 'integer',
+        'technologies' => 'json',
     ];
 
     public function portfolio()

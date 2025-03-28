@@ -13,12 +13,9 @@ class Certification extends Model
         'portfolio_id',
         'name',
         'issuer',
-        'description',
         'issue_date',
         'expiry_date',
-        'credential_id',
         'credential_url',
-        'order'
     ];
 
     protected $casts = [

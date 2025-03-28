@@ -23,7 +23,7 @@ class PortfolioPolicy
      */
     public function view(User $user, Portfolio $portfolio): bool
     {
-        return $user->id === $portfolio->user_id || $user->isAdmin();
+        return $user->id === $portfolio->user_id || $portfolio->is_public;
     }
 
     /**
@@ -39,7 +39,7 @@ class PortfolioPolicy
      */
     public function update(User $user, Portfolio $portfolio): bool
     {
-        return $user->id === $portfolio->user_id || $user->isAdmin();
+        return $user->id === $portfolio->user_id;
     }
 
     /**
@@ -47,13 +47,18 @@ class PortfolioPolicy
      */
     public function delete(User $user, Portfolio $portfolio): bool
     {
-        return $user->id === $portfolio->user_id || $user->isAdmin();
+        return $user->id === $portfolio->user_id;
     }
 
     /**
      * Determine whether the user can duplicate the model.
      */
     public function duplicate(User $user, Portfolio $portfolio): bool
+    {
+        return $user->id === $portfolio->user_id;
+    }
+
+    public function download(User $user, Portfolio $portfolio): bool
     {
         return $user->id === $portfolio->user_id;
     }

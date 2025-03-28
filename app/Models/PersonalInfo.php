@@ -4,17 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Skill extends Model
+class PersonalInfo extends Model
 {
+    protected $table = 'personal_info';
+
     protected $fillable = [
         'portfolio_id',
-        'name',
-        'category',
-        'description',
+        'title',
+        'bio',
+        'contact_info',
+    ];
+
+    protected $casts = [
+        'contact_info' => 'json',
     ];
 
     public function portfolio()
     {
         return $this->belongsTo(Portfolio::class);
     }
-}
+} 

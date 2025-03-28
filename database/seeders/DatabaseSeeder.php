@@ -51,6 +51,13 @@ class DatabaseSeeder extends Seeder
 
         // Run the portfolio seeder
         $this->call(PortfolioSeeder::class);
+
+        $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            AdminSeeder::class,
+            TemplateSeeder::class,
+        ]);
     }
 
     private function getModernMinimalistHtml(): string

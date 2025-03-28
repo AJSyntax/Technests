@@ -7,42 +7,56 @@ use Illuminate\Database\Seeder;
 
 class TemplateSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
+        // Free Templates
         Template::create([
-            'name' => 'Modern Portfolio',
-            'description' => 'A modern, clean portfolio template with a hero section, about me, projects showcase, and contact form. Perfect for developers and creative professionals.',
-            'thumbnail_url' => 'templates/modern-portfolio-thumb.jpg',
-            'preview_url' => '/templates/modern-portfolio/preview',
+            'name' => 'Modern Minimal',
+            'description' => 'A clean and modern portfolio template with a minimalist design.',
+            'thumbnail_url' => 'https://via.placeholder.com/800x600?text=Modern+Minimal',
+            'price' => 0,
             'is_premium' => false,
-            'features' => json_encode([
-                'Responsive design',
-                'Hero section with profile picture',
-                'About me section',
-                'Projects showcase grid',
-                'Contact form',
-                'Social media links',
-                'Clean and modern UI',
-                'Tailwind CSS styling',
-            ]),
         ]);
 
         Template::create([
-            'name' => 'IT Programmer Portfolio',
-            'description' => 'A modern, elegant template designed specifically for IT professionals and programmers. Features sections for technical skills, project showcases, and professional experience.',
-            'thumbnail_url' => 'templates/it-programmer-thumb.jpg',
-            'preview_url' => '/templates/it-programmer/preview',
+            'name' => 'Professional Dark',
+            'description' => 'A professional dark-themed portfolio template perfect for developers.',
+            'thumbnail_url' => 'https://via.placeholder.com/800x600?text=Professional+Dark',
+            'price' => 0,
             'is_premium' => false,
-            'features' => json_encode([
-                'Skill matrix with proficiency levels',
-                'GitHub integration',
-                'Project showcase with live demos',
-                'Technical experience timeline',
-                'Code snippet showcase',
-                'Dark/Light mode toggle',
-                'Responsive design',
-                'SEO optimized',
-            ]),
+        ]);
+
+        Template::create([
+            'name' => 'Creative Light',
+            'description' => 'A creative portfolio template with a light and airy design.',
+            'thumbnail_url' => 'https://via.placeholder.com/800x600?text=Creative+Light',
+            'price' => 0,
+            'is_premium' => false,
+        ]);
+
+        // Premium Templates
+        Template::create([
+            'name' => 'Premium Developer',
+            'description' => 'A premium portfolio template specifically designed for software developers.',
+            'thumbnail_url' => 'https://via.placeholder.com/800x600?text=Premium+Developer',
+            'price' => 29.99,
+            'is_premium' => true,
+        ]);
+
+        Template::create([
+            'name' => 'Creative Pro',
+            'description' => 'A premium creative portfolio template with advanced features.',
+            'thumbnail_url' => 'https://via.placeholder.com/800x600?text=Creative+Pro',
+            'price' => 39.99,
+            'is_premium' => true,
+        ]);
+
+        Template::create([
+            'name' => 'Business Elite',
+            'description' => 'A premium business portfolio template for professionals.',
+            'thumbnail_url' => 'https://via.placeholder.com/800x600?text=Business+Elite',
+            'price' => 49.99,
+            'is_premium' => true,
         ]);
     }
 } 

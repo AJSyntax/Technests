@@ -11,21 +11,14 @@ class Portfolio extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
         'user_id',
         'template_id',
-        'personal_info',
-        'skills',
-        'experience',
-        'projects',
+        'name',
+        'is_premium',
     ];
 
     protected $casts = [
-        'personal_info' => 'array',
-        'skills' => 'array',
-        'experience' => 'array',
-        'projects' => 'array',
-        'is_public' => 'boolean',
+        'is_premium' => 'boolean',
     ];
 
     protected $appends = [
@@ -35,26 +28,6 @@ class Portfolio extends Model
     public function getProfilePictureAttribute()
     {
         return $this->profile_picture_url ?? asset('images/default-avatar.png');
-    }
-
-    public function setPersonalInfoAttribute($value)
-    {
-        $this->attributes['personal_info'] = is_array($value) ? json_encode($value) : $value;
-    }
-
-    public function setSkillsAttribute($value)
-    {
-        $this->attributes['skills'] = is_array($value) ? json_encode($value) : $value;
-    }
-
-    public function setExperienceAttribute($value)
-    {
-        $this->attributes['experience'] = is_array($value) ? json_encode($value) : $value;
-    }
-
-    public function setProjectsAttribute($value)
-    {
-        $this->attributes['projects'] = is_array($value) ? json_encode($value) : $value;
     }
 
     public function user()
@@ -67,6 +40,11 @@ class Portfolio extends Model
         return $this->belongsTo(Template::class);
     }
 
+    public function personalInfo()
+    {
+        return $this->hasOne(PersonalInfo::class);
+    }
+
     public function skills()
     {
         return $this->hasMany(Skill::class);
@@ -77,18 +55,18 @@ class Portfolio extends Model
         return $this->hasMany(Project::class);
     }
 
-    public function experiences()
-    {
-        return $this->hasMany(Experience::class)->orderBy('order');
-    }
-
     public function education()
     {
-        return $this->hasMany(Education::class)->orderBy('order');
+        return $this->hasMany(Education::class);
     }
 
     public function certifications()
     {
-        return $this->hasMany(Certification::class)->orderBy('order');
+        return $this->hasMany(Certification::class);
+    }
+
+    public function downloads()
+    {
+        return $this->hasMany(Download::class);
     }
 }

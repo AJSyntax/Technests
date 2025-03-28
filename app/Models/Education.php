@@ -15,19 +15,14 @@ class Education extends Model
         'portfolio_id',
         'institution',
         'degree',
-        'field_of_study',
-        'description',
+        'field',
         'start_date',
         'end_date',
-        'is_current',
-        'location',
-        'order'
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'is_current' => 'boolean',
     ];
 
     public function portfolio()
